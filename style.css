@@ -1,0 +1,167 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    color: #9FA5A7;
+}
+
+.wrapper {
+    width: 50%;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.block {
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-block {
+    margin-top: 10px;
+    width: calc(50% - 25px);
+}
+
+.space {
+    min-width: 30%;
+}
+
+.city-flex {
+    display: flex;
+    align-items: center;
+}
+
+h3 {
+    font-size: 40px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.current-temperature {
+    font-size: 6rem;
+}
+
+.row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    margin-bottom: 10px;
+    padding: 2rem 0;
+}
+
+.weather-large-icon {
+    width: 7rem;
+}
+
+h4 {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+}
+.temperature {
+    font-size: 26px;
+    font-weight: bolder;
+}
+.weather-small-icon {
+    height: 4rem;
+}
+.remove-btn {
+    cursor: pointer;
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: #708188;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #fff;
+    transition:background, box-shadow .3s ease-in-out;
+}
+
+.thin-block {
+    display: flex;
+    justify-content: space-between;
+}
+
+.update-geo {
+    outline: none;
+    border: none;
+    background: #dae2ea;
+    color: #55677d;
+    padding: 0 3rem;
+    line-height: 1;
+    border-radius: 5px;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.block-title {
+    font-size: 36px;
+    min-width: 30%;
+}
+
+.input-form {
+    background: #f1f1f1;
+    outline: none;
+    border: none;
+    height: 40px;
+    padding-right: 5rem;
+    padding-left: 1rem;
+    border-radius: 5px;
+}
+
+.add-btn {
+    cursor: pointer;
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+    background: #708188;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    transition:background, box-shadow .3s ease-in-out;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem;
+    background: #a7afb1;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.row:first-child {
+    margin-top: 0;
+}
+.row-title {
+    font-weight: bolder;
+    color: #fff;
+}
+
+.row-text {
+    color: #dbe2e6;
+}
+
+.mt-2rem {
+    margin-top: 2rem;
+}
+
+.mr-2rem {
+    margin-right: 2rem;
+}
+
+@media only screen and (max-width: 1440px) {
+    .wrapper {
+        width: 75%;
+    }
+}
