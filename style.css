@@ -227,9 +227,13 @@ h4 {
         justify-content: flex-start;
     }
 
+    .search {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
     .input-form {
-        /* margin-top: 1rem; */
-        padding: 0 120px 0 10px;
+        width: 100%;
     }
 }
 
