@@ -5,13 +5,34 @@
 body {
     padding: 0;
     margin: 0;
-    color: #9FA5A7;
 }
 
 .wrapper {
     width: 50%;
     margin: 0 auto;
     padding: 1rem 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.refresh-geo {
+    outline: none;
+    border: none;
+    background: #dae2ea;
+    border-radius: 5px;
+}
+
+.refresh-text {
+    color: #55677d;
+    padding: 0 3rem;
+    line-height: 1;
+}
+
+.refresh-icon {
+    display: none;
 }
 
 .block {
@@ -37,10 +58,12 @@ h3 {
     font-size: 40px;
     font-weight: 500;
     margin: 0;
+    color: #6e797e;
 }
 
 .current-temperature {
     font-size: 6rem;
+    color: #9FA5A7;
 }
 
 .row-header {
@@ -50,6 +73,7 @@ h3 {
     height: 40px;
     margin-bottom: 10px;
     padding: 2rem 0;
+    color: #6e797e;
 }
 
 .weather-large-icon {
@@ -61,40 +85,19 @@ h4 {
     font-weight: bold;
     margin: 0;
 }
+
 .temperature {
     font-size: 26px;
     font-weight: bolder;
 }
+
 .weather-small-icon {
     height: 4rem;
 }
-.remove-btn {
-    cursor: pointer;
-    height: 35px;
-    width: 35px;
-    border-radius: 50%;
-    background: #708188;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: #fff;
-    transition:background, box-shadow .3s ease-in-out;
-}
 
-.thin-block {
+.input-block {
     display: flex;
     justify-content: space-between;
-}
-
-.update-geo {
-    outline: none;
-    border: none;
-    background: #dae2ea;
-    color: #55677d;
-    padding: 0 3rem;
-    line-height: 1;
-    border-radius: 5px;
 }
 
 .search {
@@ -106,30 +109,37 @@ h4 {
 .block-title {
     font-size: 36px;
     min-width: 30%;
+    color: #6e797e;
 }
 
 .input-form {
     background: #f1f1f1;
     outline: none;
     border: none;
-    height: 40px;
-    padding-right: 5rem;
+    height: 2.5rem;
+    width: 15rem;
     padding-left: 1rem;
     border-radius: 5px;
 }
 
-.add-btn {
-    cursor: pointer;
-    height: 35px;
-    width: 35px;
-    border-radius: 50%;
-    background: #708188;
+.round-btn {
     display: flex;
+    height: 2rem;
+    width: 2rem;
+    cursor: pointer;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    background: #708188;
+    border-radius: 50%;
     color: #fff;
-    transition:background, box-shadow .3s ease-in-out;
+}
+
+.remove-btn {
+    font-size: 0.7rem;
+}
+
+.add-btn {
+    font-size: 1rem;
 }
 
 .row {
@@ -140,9 +150,11 @@ h4 {
     font-size: 12px;
     margin-top: 5px;
 }
+
 .row:first-child {
     margin-top: 0;
 }
+
 .row-title {
     font-weight: bolder;
     color: #fff;
@@ -150,6 +162,10 @@ h4 {
 
 .row-text {
     color: #dbe2e6;
+}
+
+.mt-1rem {
+    margin-top: 1rem;
 }
 
 .mt-2rem {
@@ -165,3 +181,55 @@ h4 {
         width: 75%;
     }
 }
+
+@media only screen and (max-width: 1024px) {
+    .wrapper {
+        width: 100%;
+    }
+
+    .refresh-text {
+        display: none;
+    }
+
+    .refresh-icon {
+        display: block;
+        width: 3rem;
+    }
+
+    .space {
+        display: none;
+    }
+
+    .block {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .info-block {
+        width: 100%;
+        flex: 0 100%;
+        box-sizing: border-box;
+    }
+
+    .info-block:nth-child(2n) {
+        margin-left: 0;
+    }
+
+    h4 {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .input-block {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
+    .input-form {
+        /* margin-top: 1rem; */
+        padding: 0 120px 0 10px;
+    }
+}
+
