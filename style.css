@@ -13,43 +13,71 @@ body {
     padding: 1rem 2rem;
 }
 
-.header {
+header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+h1, h2 {
+    display: block;
+    font-weight: normal;
+    font-size: 36px;
+    min-width: 30%;
+    color: #6e797e;
+}
+
+ul, li {
+    display: block;
 }
 
 .refresh-geo {
+    display: block;
     outline: none;
     border: none;
     background: #dae2ea;
     border-radius: 5px;
-}
-
-.refresh-text {
     color: #55677d;
     padding: 0 3rem;
-    line-height: 1;
+    height: 3rem;
+    text-align: center;
 }
 
-.refresh-icon {
+.refresh-btn {
     display: none;
 }
 
 .block {
     display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+.block-main {
     justify-content: space-between;
+}
+
+.main-location-stats {
+    margin-top: 10px;
+    width: calc(50% - 25px);
+    padding: 0;
 }
 
 .info-block {
     margin-top: 10px;
-    width: calc(50% - 25px);
+    flex: calc(50% - 25px);
+}
+
+.info-block:nth-child(2n){
+    margin-left: 2rem;
 }
 
 .space {
     min-width: 30%;
 }
 
-.city-flex {
+.main-location-flex {
     display: flex;
     align-items: center;
 }
@@ -62,11 +90,12 @@ h3 {
 }
 
 .current-temperature {
+    display: flex;
     font-size: 6rem;
     color: #9FA5A7;
 }
 
-.row-header {
+.extra-city-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -106,12 +135,6 @@ h4 {
     justify-content: space-between;
 }
 
-.block-title {
-    font-size: 36px;
-    min-width: 30%;
-    color: #6e797e;
-}
-
 .input-form {
     background: #f1f1f1;
     outline: none;
@@ -132,6 +155,11 @@ h4 {
     background: #708188;
     border-radius: 50%;
     color: #fff;
+}
+
+.city-stats {
+    padding: 0;
+    margin: 0;
 }
 
 .remove-btn {
@@ -187,13 +215,36 @@ h4 {
         width: 100%;
     }
 
-    .refresh-text {
+    .refresh-geo {
         display: none;
+    }
+
+    .refresh-btn {
+        display: block;
+        outline: none;
+        border: none;
+        background: #dae2ea;
+        border-radius: 5px;
+        color: #55677d;
+        text-align: center;
+        height: 3rem;
     }
 
     .refresh-icon {
         display: block;
-        width: 3rem;
+        height: 2rem;
+    }
+
+    .main-location-info {
+        width: 100%;
+        flex: 0 100%;
+    }
+
+    .main-location-stats {
+        width: 100%;
+        margin-left: 0;
+        flex: 0 100%;
+        padding: 0;
     }
 
     .space {
@@ -203,7 +254,9 @@ h4 {
     .block {
         flex-direction: column;
         align-items: center;
+        flex-wrap: wrap;
         width: 100%;
+        display: flex;
     }
 
     .info-block {
