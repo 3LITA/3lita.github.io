@@ -82,7 +82,7 @@ ul, li {
     align-items: center;
 }
 
-h3 {
+.main-location-name {
     font-size: 40px;
     font-weight: 500;
     margin: 0;
@@ -109,7 +109,7 @@ h3 {
     width: 7rem;
 }
 
-h4 {
+h3 {
     font-size: 28px;
     font-weight: bold;
     margin: 0;
@@ -269,7 +269,7 @@ h4 {
         margin-left: 0;
     }
 
-    h4 {
+    h3 {
         font-size: 24px;
         font-weight: bold;
     }
@@ -287,6 +287,24 @@ h4 {
 
     .input-form {
         width: 100%;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .main-location-name {
+        font-size: 2rem;
+    }
+    
+    .current-temperature {
+        font-size: 5rem;
+    }
+
+    .row {
+        font-size: 0.65rem;
     }
 }
 
