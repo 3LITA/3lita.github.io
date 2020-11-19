@@ -14,6 +14,8 @@ class WeatherError extends Error {
     constructor(message) {
         super(message);
         this.name = "WeatherError";
+
+        
     }
 }
 
@@ -117,15 +119,12 @@ class Location {
                 oldData.parentNode.replaceChild(newData, oldData);
             })
             .catch((e) => {
-                console.log(e);
                 if (e instanceof WeatherError) {
-                    let newNode = this.fillDataError(e.message);
-                    let oldNode = document.querySelector(`#${this.locationId}`);
-                    oldNode.parentNode.replaceChild(newNode, oldNode);
+                    alert(e);
+                    this.delete();
+                    return;
                 }
-                else {
-                    throw e;
-                }
+                console.log(e);
             });
 
         return document.importNode(loader, true);
@@ -184,7 +183,7 @@ async function addSavedLocation() {
 
     let newLocationId = generateLocationId(locationSearchString);
     if (savedLocations.has(newLocationId)) {
-        alert(`Локация "${newLocationId}" уже добавлена`);
+        window.alert(`Локация "${newLocationId}" уже добавлена`);
         return;
     }
     
@@ -244,5 +243,5 @@ async function initPage() {
 
 
 document.addEventListener("DOMContentLoaded", initPage);
-document.querySelector("#addLocationButton").addEventListener("click", addSavedLocation);
+document.querySelector("#addLocationForm").addEventListener("submit", addSavedLocation);
 document.querySelector("#refreshGeo").addEventListener("click", initCurrentLocation);
