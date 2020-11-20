@@ -169,10 +169,10 @@ async function loadDefaultLocation(error) {
 }
 
 
-async function addSavedLocation() {
-    event.preventDefault();
+async function addSavedLocation(evt) {
+    evt.preventDefault();
 
-    let input = document.querySelector("#addLocationInput");
+    let input = evt.target.querySelector("#addLocationInput");
     let locationSearchString = input.value;
     input.value = "";
 
