@@ -1,4 +1,4 @@
-import { API_KEY, DEFAULT_LOCATION } from './config.js'
+import { BACKEND_URL, DEFAULT_LOCATION } from './config.js'
 
 
 var locationMap = new Map();
@@ -14,24 +14,27 @@ class WeatherError extends Error {
     constructor(message) {
         super(message);
         this.name = "WeatherError";
-
-        
     }
 }
 
 
 class Location {
-    constructor(templateId, location, customId = null) {
+    constructor(templateId, location, customId = null, fetchCoords = false) {
         this.templateId = templateId;
         this.location = location;
         this.customId = customId;
+        this.fetchCoords = fetchCoords;
 
         this.weatherData = null;
     }
 
     async fetchWeather() {
         try {
-            var resp = await fetch(`https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${this.location}`);
+            if (this.fetchCoords) {
+                var resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.location.lat}&long=${this.location.long}`);
+            } else {
+                var resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.location}`);
+            }
         } catch (e) {
             if (!(e instanceof TypeError)) {
                 throw e;
@@ -39,15 +42,12 @@ class Location {
             throw new WeatherError(e.message);
         }
 
-        switch(resp.status) {
-            case 200:
-                this.weatherData = await resp.json();
-                return true;
-            case 400:
-                throw new WeatherError(`Локация "${this.location}" не обнаружена`);
-            default:
-                throw new WeatherError("Ошибка работы API");
+        if (resp.status == 200) {
+            this.weatherData = await resp.json();
+            return true;
         }
+
+        throw new WeatherError(await resp.text());
     }
 
     build() {
@@ -61,15 +61,15 @@ class Location {
     fillData() {
         let weatherTemplate = document.querySelector(this.templateId).content;
 
-        weatherTemplate.querySelector('*[name="location"').textContent = this.weatherData.location.name;
-        weatherTemplate.querySelector('img[name="icon"]').src = `https://${this.weatherData.current.condition.icon.replace("64x64", "128x128")}`;
-        weatherTemplate.querySelector('span[name="temperature"]').textContent = `${this.weatherData.current.temp_c}°C`;
+        weatherTemplate.querySelector('*[name="location"]').textContent = this.weatherData.name;
+        weatherTemplate.querySelector('img[name="icon"]').src = this.weatherData.icon;
+        weatherTemplate.querySelector('span[name="temperature"]').textContent = this.weatherData.temperature;
 
-        weatherTemplate.querySelector('li[name="wind"] span.row-text').textContent = `${this.weatherData.current.wind_kph} kph ${this.weatherData.current.wind_dir}`;
-        weatherTemplate.querySelector('li[name="clouds"] span.row-text').textContent = this.weatherData.current.condition.text;
-        weatherTemplate.querySelector('li[name="pressure"] span.row-text').textContent = `${this.weatherData.current.pressure_mb} mb`;
-        weatherTemplate.querySelector('li[name="humidity"] span.row-text').textContent = `${this.weatherData.current.humidity}%`;
-        weatherTemplate.querySelector('li[name="coordinates"] span.row-text').textContent = `[${this.weatherData.location.lat}, ${this.weatherData.location.lon}]`;
+        weatherTemplate.querySelector('li[name="wind"] span:nth-child(2)').textContent = this.weatherData.details.wind;
+        weatherTemplate.querySelector('li[name="clouds"] span:nth-child(2)').textContent = this.weatherData.details.clouds;
+        weatherTemplate.querySelector('li[name="pressure"] span:nth-child(2)').textContent = this.weatherData.details.pressure;
+        weatherTemplate.querySelector('li[name="humidity"] span:nth-child(2)').textContent = this.weatherData.details.humidity;
+        weatherTemplate.querySelector('li[name="coordinates"] span:nth-child(2)').textContent = this.weatherData.details.coords;
 
         weatherTemplate.querySelector('*[name="container"]').id = this.locationId;
 
@@ -120,6 +120,7 @@ class Location {
             })
             .catch((e) => {
                 if (e instanceof WeatherError) {
+                    console.log(e)
                     alert(e);
                     this.delete();
                     return;
@@ -136,11 +137,6 @@ class Location {
 }
 
 
-function saveLocations() {
-    localStorage.setItem("savedLocations", JSON.stringify(Array.from(savedLocations)));
-}
-
-
 function initCurrentLocation() {
     let wrapNode = document.querySelector(".block-main");
     wrapNode.textContent = "";
@@ -151,10 +147,17 @@ function initCurrentLocation() {
 
 async function loadCurrentLocation(location) {
     if (location instanceof GeolocationPosition) {
-        location = `${location.coords.latitude},${location.coords.longitude}`;
+        location = {
+            'lat': location.coords.latitude,
+            'long': location.coords.longitude
+        };
+        var fetchCoords = true;
+    }
+    else {
+        var fetchCoords = false;
     }
 
-    let primaryWeatherItem = new Location("#currentLocationTemplate", location, "_here");
+    let primaryWeatherItem = new Location("#currentLocationTemplate", location, "_here", fetchCoords);
     let primaryWeather = primaryWeatherItem.build();
 
     let wrapNode = document.querySelector(".block-main");
@@ -191,7 +194,16 @@ async function addSavedLocation(evt) {
     locationMap.set(newLocationId, newLocation);
 
     savedLocations.add(newLocationId);
-    saveLocations();
+    await fetch(
+        `${BACKEND_URL}/favourites`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({'name': newLocationId})
+        }
+    )
 
     rebuildLocationList();
 }
@@ -200,7 +212,8 @@ async function addSavedLocation(evt) {
 function deleteSavedLocation(nodeId) {
     locationMap.delete(nodeId);
     savedLocations.delete(nodeId);
-    saveLocations();
+    
+    fetch(`${BACKEND_URL}/favourites?name=${nodeId}`, {method: 'DELETE'})
 
     rebuildLocationList();
 }
@@ -233,10 +246,10 @@ async function initSavedLocations() {
 
 
 async function initPage() {
-    let localStorageLocations = localStorage.getItem("savedLocations");
-    if (localStorageLocations != null) {
-        savedLocations = new Set(JSON.parse(localStorageLocations));
-    }
+    let favouritesResp = await fetch(`${BACKEND_URL}/favourites`).catch(console.log);
+    let secondaryWeatherLocationsList = await favouritesResp.json();
+    savedLocations = new Set(secondaryWeatherLocationsList.map(({name}) => name));
+
     initCurrentLocation();
     await initSavedLocations();
 }

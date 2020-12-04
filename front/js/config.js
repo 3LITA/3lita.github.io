@@ -1,2 +1,3 @@
-export const API_KEY = "38e21bea495a4cacbc8195504200511";
+export const BACKEND_URL = "http://localhost:3000";
+// export const BACKEND_URL = "https://962dd0d07493.ngrok.io";
 export const DEFAULT_LOCATION = "Samara"

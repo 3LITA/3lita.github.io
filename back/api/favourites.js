@@ -2,10 +2,11 @@ var server = require('../server');
 
 
 server.app.get('/favourites', (req, res) => {
+    console.info(`New GET request on /favourites`)
     server.db.all('SELECT name FROM favourites', (err, rows) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send("Database error");
+            res.status(500).set('Access-Control-Allow-Origin', "*").send("Database error");
             return;
         }
 
@@ -14,6 +15,7 @@ server.app.get('/favourites', (req, res) => {
 });
 
 server.app.post('/favourites', (req, res) => {
+    console.info(`New POST request on /favourites: name=${req.body.name}`)
     if (!req.body.name) {
         res.status(400).send("Please specify location name");
         return;
@@ -33,6 +35,7 @@ server.app.post('/favourites', (req, res) => {
 });
 
 server.app.delete('/favourites', (req, res) => {
+    console.info(`New DELETE request on /favourites, name=${req.body.name}`)
     if (!req.query.name) {
         res.status(400).send("Please specify location name");
         return;

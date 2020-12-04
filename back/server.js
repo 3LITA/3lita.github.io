@@ -1,3 +1,4 @@
+const cors = require('cors')
 const express = require('express')
 const sqlite3 = require('sqlite3')
 
@@ -5,8 +6,9 @@ const config = require('./config')
 
 
 var app = express();
-app.use(express.static('../front'))
-app.use(express.json())
+app.use(express.static('../front'));
+app.use(express.json());
+app.use(cors());
 
 var db = new sqlite3.Database(config.DB_SOURCE, (err) => {
     if (err) {

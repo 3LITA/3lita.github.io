@@ -4,7 +4,8 @@
   "description": "ITMO web course",
   "main": "back/index.js",
   "scripts": {
-    "devrun": "nodemon back/index.js"
+    "devrun": "nodemon back/index.js",
+    "start": "node ./back/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/3LITA/itmoweb#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "request": "^2.88.2",
     "sqlite3": "^5.0.0"
