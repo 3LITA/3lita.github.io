@@ -7,7 +7,7 @@ let savedLocations = new Set();
 
 
 function generateLocationId(src) {
-    return src.replace(" ", "").toLowerCase();
+    return src.replace(" ", "-").toLowerCase();
 }
 
 
@@ -183,7 +183,7 @@ async function addSavedLocation(evt) {
 
     let newLocation = new Location(SECONDARY_LOCATION_TEMPLATE, locationSearchString, newLocationId, false);
 
-    let resp = await Api.addFavouriteLocation(locationSearchString);
+    let resp = await Api.addFavouriteLocation(newLocationId);
 
     switch (resp.status) {
         case 200:

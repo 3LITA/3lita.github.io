@@ -10,7 +10,6 @@ async function checkLocationExists(locationName) {
         encodeURI(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`),
         {json: true},
         (apiErr, apiResp, apiRespBody) => {
-            console.info(`I'm inside a callback!!!`)
             switch (apiResp.statusCode) {
                 case 200:
                     console.info(`Location "${locationName}" found!`)
@@ -22,7 +21,6 @@ async function checkLocationExists(locationName) {
             }
         }
     );
-    console.info(`Exists = ${exists}`);
     return exists;
 }
 
@@ -55,7 +53,7 @@ server.app.post('/favourites', (req, res) => {
         return;
     }
 
-    let statement = server.db.prepare('INSERT INTO favourites VALUES (?)');
+    let statement = server.db.prepare("INSERT INTO favourites VALUES (?)");
 
     statement.run(req.body.name, (err) => {
         if (err) {
@@ -75,7 +73,7 @@ server.app.delete('/favourites/:name', (req, res) => {
         return;
     }
 
-    let statement = server.db.prepare('DELETE FROM favourites WHERE name=?');
+    let statement = server.db.prepare("DELETE FROM favourites WHERE name=?");
 
     statement.run(req.params.name, (err) => {
         if (err) {
