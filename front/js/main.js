@@ -1,8 +1,11 @@
 import { BACKEND_URL, DEFAULT_LOCATION } from './config.js'
 
 
-var locationMap = new Map();
-var savedLocations = new Set();
+const PRIMARY_LOCATION_TEMPLATE = "#currentLocationTemplate";
+const SECONDARY_LOCATION_TEMPLATE = "#savedLocationTemplate";
+
+let locationMap = new Map();
+let savedLocations = new Set();
 
 
 function generateLocationId(src) {
@@ -19,11 +22,11 @@ class WeatherError extends Error {
 
 
 class Location {
-    constructor(templateId, location, customId = null, fetchCoords = false) {
+    constructor(templateId, locationNameOrCoords, customId = null, searchByCoords = false) {
         this.templateId = templateId;
-        this.location = location;
+        this.locationNameOrCoords = locationNameOrCoords;
         this.customId = customId;
-        this.searchByCoords = fetchCoords;
+        this.searchByCoords = searchByCoords;
 
         this.weatherData = null;
     }
@@ -32,14 +35,12 @@ class Location {
         let resp;
         try {
             if (this.searchByCoords) {
-                resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.location.lat}&long=${this.location.long}`);
+                resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.locationNameOrCoords.lat}&long=${this.locationNameOrCoords.long}`);
             } else {
-                resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.location}`);
+                resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.locationNameOrCoords}`);
             }
         } catch (e) {
-            if (!(e instanceof TypeError)) {
-                throw e;
-            }
+            console.log("Unexpected error occurred", e)
             return;
         }
 
@@ -49,7 +50,7 @@ class Location {
                 return false;
             case 404:
                 window.alert(`Локация не найдена!`)
-                this.delete();
+                await this.delete();
                 return true;
         }
 
@@ -94,7 +95,7 @@ class Location {
     load() {
         let loader = document.querySelector(`${this.templateId}Loader`).content;
 
-        let rawLocationId = this.customId ? this.customId : this.location;
+        let rawLocationId = this.customId ? this.customId : this.locationNameOrCoords;
         this.locationId = generateLocationId(rawLocationId);
         loader.querySelector('*[name="container"]').id = this.locationId;
 
@@ -104,11 +105,11 @@ class Location {
                 let oldData = document.querySelector(`#${this.locationId}`);
                 oldData.parentNode.replaceChild(newData, oldData);
             })
-            .catch((e) => {
+            .catch(async (e) => {
                 if (e instanceof WeatherError) {
                     console.log(e)
                     alert(e);
-                    this.delete();
+                    await this.delete();
                     return;
                 }
                 console.log(e);
@@ -117,8 +118,13 @@ class Location {
         return document.importNode(loader, true);
     }
 
-    delete() {
-        deleteSavedLocation(this.locationId);
+    async delete() {
+        await fetch(`${BACKEND_URL}/favourites/${this.locationId}`, {method: 'DELETE'}).then(() => {});
+
+        locationMap.delete(this.locationId);
+        savedLocations.delete(this.locationId);
+
+        rebuildLocationList();
     }
 }
 
@@ -144,7 +150,7 @@ async function loadCurrentLocation(location) {
         searchByCoords = false;
     }
 
-    let primaryWeatherItem = new Location("#currentLocationTemplate", location, "_here", searchByCoords);
+    let primaryWeatherItem = new Location(PRIMARY_LOCATION_TEMPLATE, location, "_here", searchByCoords);
     let primaryWeather = primaryWeatherItem.build();
 
     let wrapNode = document.querySelector(".block-main");
@@ -176,29 +182,29 @@ async function addSavedLocation(evt) {
         window.alert(`Локация "${newLocationId}" уже добавлена`);
         return;
     }
-    
-    await fetch(
-        `${BACKEND_URL}/favourites`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({'name': newLocationId})
-        }
-    );
-    rebuildLocationList();
-}
 
+    try {
+        let resp = await fetch(
+            `${BACKEND_URL}/favourites`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({'name': newLocationId})
+            }
+        );
+        console.log(resp);
 
-function deleteSavedLocation(nodeId) {
-    event.preventDefault();
-    fetch(`${BACKEND_URL}/favourites?name=${nodeId}`, {method: 'DELETE'}).then(() => {});
-    
-    locationMap.delete(nodeId);
-    savedLocations.delete(nodeId);
-    
-    rebuildLocationList();
+        let newLocation = new Location(SECONDARY_LOCATION_TEMPLATE, locationSearchString, newLocationId,false);
+        locationMap.set(newLocationId, newLocation);
+
+        savedLocations.add(newLocationId);
+
+        rebuildLocationList();
+    } catch (error) {
+        console.log("Failed to add new location ", newLocationId, error);
+    }
 }
 
 
@@ -220,7 +226,7 @@ function rebuildLocationList() {
 
 
 async function initSavedLocations() {
-    for (var weatherId of savedLocations) {
+    for (let weatherId of savedLocations) {
         let location = new Location("#savedLocationTemplate", weatherId);
         locationMap.set(weatherId, location);
     }

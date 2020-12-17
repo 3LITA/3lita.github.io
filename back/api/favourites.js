@@ -1,4 +1,22 @@
+var request = require('request');
+
 var server = require('../server');
+
+
+// function checkLocationExists(locationName) {
+//     request.get(
+//         encodeURI(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`),
+//         {json: true},
+//         (apiErr, apiResp, apiRespBody) => {
+//             switch (apiResp.statusCode) {
+//                 case 200:
+//                     return true;
+//                 default:
+//                     return false;
+//             }
+//         }
+//     );
+// }
 
 
 server.app.get('/favourites', (req, res) => {
@@ -20,6 +38,10 @@ server.app.post('/favourites', (req, res) => {
         res.status(400).send("Please specify location name");
         return;
     }
+    // if (!checkLocationExists(req.body.name)) {
+    //     res.status(404).send("Location not found");
+    //     return;
+    // }
 
     let statement = server.db.prepare('INSERT INTO favourites VALUES (?)');
 
@@ -34,16 +56,16 @@ server.app.post('/favourites', (req, res) => {
     });
 });
 
-server.app.delete('/favourites', (req, res) => {
-    console.info(`New DELETE request on /favourites, name=${req.body.name}`)
-    if (!req.query.name) {
+server.app.delete('/favourites/:name', (req, res) => {
+    console.info(`New DELETE request on /favourites, name=${req.params.name}`)
+    if (!req.params.name) {
         res.status(400).send("Please specify location name");
         return;
     }
 
     let statement = server.db.prepare('DELETE FROM favourites WHERE name=?');
 
-    statement.run(req.query.name, (err) => {
+    statement.run(req.params.name, (err) => {
         if (err) {
             console.error(err);
             res.status(500).send("Database error");
