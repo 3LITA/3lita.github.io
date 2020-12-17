@@ -239,4 +239,3 @@ async function initPage() {
 document.addEventListener("DOMContentLoaded", initPage);
 document.querySelector("#addLocationForm").addEventListener("submit", addSavedLocation);
 document.querySelector("#refreshGeo").addEventListener("click", initCurrentLocation);
-addEventListener('beforeunload',()=>{debugger});

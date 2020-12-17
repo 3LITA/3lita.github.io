@@ -2,10 +2,10 @@
   "name": "itmoweb",
   "version": "1.0.0",
   "description": "ITMO web course",
-  "main": "back/index.js",
+  "main": "src/back/index.js",
   "scripts": {
-    "devrun": "nodemon back/index.js",
-    "start": "node ./back/index.js"
+    "devrun": "nodemon src/back/index.js",
+    "start": "node src/back/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,16 @@
     "sqlite3": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
     "jest": "^26.6.3",
     "nodemon": "^2.0.6"
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node",
+    "testURL": "http://localhost/",
+    "setupFiles": [
+      "./tests/mocks/client.js"
+    ]
   }
 }

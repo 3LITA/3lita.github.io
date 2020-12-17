@@ -1,13 +1,7 @@
-<html lang="en">
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style.css">
-    <title>Погода</title>
-</head>
-
-<body>
+const html = `
     <div class="wrapper">
         <header>
             <h1 class="mr-2rem">Погода здесь</h1>
@@ -17,19 +11,19 @@
             </button>
             <div class="space"></div>
         </header>
-
+    
         <main>
             <div class="block block-main mt-1rem"></div>
-
+    
             <div class="input-block mt-2rem">
                 <h2>Избранное</h2>
-
+    
                 <form id="addLocationForm">
                     <input id="addLocationInput" class="input-form mr-2rem" type="text" placeholder="Добавить новый город">
                     <button id="addLocationButton" class="add-btn round-btn" type="submit">+</button>
                 </form>
             </div>
-
+    
             <ul class="block block-extra"></ul>
         </main>
     </div>
@@ -42,7 +36,7 @@
                 <span class="current-temperature" name="temperature"></span>
             </div>
         </div>
-
+    
         <ul class="main-location-stats">
             <li class="row" name="wind">
                 <span class="row-title">Ветер</span>
@@ -66,7 +60,7 @@
             </li>
         </ul>
     </template>
-
+    
     <template id="savedLocationTemplate">
         <li class="info-block" name="container">
             <div class="extra-city-header">
@@ -99,19 +93,19 @@
             </ul>
         </li>
     </template>
-
+    
     <template id="currentLocationTemplateLoader">
         <div name="container">
             <h3>Загрузка данных...</h3>
         </div>
     </template>
-
+    
     <template id="savedLocationTemplateLoader">
         <div name="container">
             <h3>Загрузка данных...</h3>
         </div>
     </template>
-
+    
     <template id="savedLocationTemplateError">
         <li class="info-block">
             <div class="extra-city-header" name="container">
@@ -121,8 +115,22 @@
             <h4 name="error"></h4>
         </li>
     </template>
+`
+const dom = new JSDOM(html)
 
-    <script type="module" src="js/main.js"></script>
-</body>
+global["window"] = dom.window
+global["document"] = dom.window.document
+const positions = {
+    coords: {
+        latitude: '12',
+        longitude: '23',
+    }
+}
 
-</html>
+global["navigator"] = {
+    geolocation:{
+        getCurrentPosition: (res, rej, opts) => res(positions),
+    }
+}
+
+global["alert"] = (msg) => console.info(msg)
