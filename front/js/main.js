@@ -47,7 +47,7 @@ class Location {
                 this.weatherData = await resp.json();
                 return;
             case 404:
-                window.alert(`Ошибка работы API!`)
+                window.alert(`Локация ${this.locationName} не найдена!`)
                 await this.delete();
                 return;
         }
