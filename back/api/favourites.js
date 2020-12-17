@@ -1,22 +1,30 @@
-var request = require('request');
+let request = require('request');
 
-var server = require('../server');
+let server = require('../server');
+let config = require('../config');
 
 
-// function checkLocationExists(locationName) {
-//     request.get(
-//         encodeURI(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`),
-//         {json: true},
-//         (apiErr, apiResp, apiRespBody) => {
-//             switch (apiResp.statusCode) {
-//                 case 200:
-//                     return true;
-//                 default:
-//                     return false;
-//             }
-//         }
-//     );
-// }
+async function checkLocationExists(locationName) {
+    let exists = false;
+    request.get(
+        encodeURI(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`),
+        {json: true},
+        (apiErr, apiResp, apiRespBody) => {
+            console.info(`I'm inside a callback!!!`)
+            switch (apiResp.statusCode) {
+                case 200:
+                    console.info(`Location "${locationName}" found!`)
+                    exists = true;
+                    break;
+                default:
+                    console.info(`Location "${locationName} not found: status=${apiResp.statusCode}"`);
+                    exists = false;
+            }
+        }
+    );
+    console.info(`Exists = ${exists}`);
+    return exists;
+}
 
 
 server.app.get('/favourites', (req, res) => {
@@ -38,10 +46,14 @@ server.app.post('/favourites', (req, res) => {
         res.status(400).send("Please specify location name");
         return;
     }
-    // if (!checkLocationExists(req.body.name)) {
-    //     res.status(404).send("Location not found");
-    //     return;
-    // }
+
+    console.log(`Checking if location ${req.body.name} exists`)
+
+    if (!checkLocationExists(req.body.name)) {
+        console.info(`Location`)
+        res.status(404).send("Location not found");
+        return;
+    }
 
     let statement = server.db.prepare('INSERT INTO favourites VALUES (?)');
 

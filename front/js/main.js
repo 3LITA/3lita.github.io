@@ -1,8 +1,6 @@
-import { BACKEND_URL, DEFAULT_LOCATION } from './config.js'
+import { DEFAULT_LOCATION, PRIMARY_LOCATION_TEMPLATE, SECONDARY_LOCATION_TEMPLATE } from './config.js'
+import Api from './requests.js';
 
-
-const PRIMARY_LOCATION_TEMPLATE = "#currentLocationTemplate";
-const SECONDARY_LOCATION_TEMPLATE = "#savedLocationTemplate";
 
 let locationMap = new Map();
 let savedLocations = new Set();
@@ -22,11 +20,11 @@ class WeatherError extends Error {
 
 
 class Location {
-    constructor(templateId, locationNameOrCoords, customId = null, searchByCoords = false) {
+    constructor(templateId, locationName = null, customId = null, coordinates = null) {
         this.templateId = templateId;
-        this.locationNameOrCoords = locationNameOrCoords;
+        this.coordinates = coordinates;
+        this.locationName = locationName;
         this.customId = customId;
-        this.searchByCoords = searchByCoords;
 
         this.weatherData = null;
     }
@@ -34,10 +32,10 @@ class Location {
     async fetchWeather() {
         let resp;
         try {
-            if (this.searchByCoords) {
-                resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.locationNameOrCoords.lat}&long=${this.locationNameOrCoords.long}`);
+            if (this.coordinates) {
+                resp = await Api.fetchWeatherByCoordinates(this.locationName);
             } else {
-                resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.locationNameOrCoords}`);
+                resp = await Api.fetchWeatherByLocationName(this.locationName);
             }
         } catch (e) {
             console.log("Unexpected error occurred", e)
@@ -47,11 +45,11 @@ class Location {
         switch (resp.status) {
             case 200:
                 this.weatherData = await resp.json();
-                return false;
+                return;
             case 404:
-                window.alert(`Локация не найдена!`)
+                window.alert(`Ошибка работы API!`)
                 await this.delete();
-                return true;
+                return;
         }
 
         throw new WeatherError(await resp.text());
@@ -83,9 +81,9 @@ class Location {
         let clone = document.importNode(weatherTemplate, true);
         let remove_btn = clone.querySelector(".remove-btn");
         if (remove_btn) {
-            var item = this;
-            remove_btn.addEventListener("click", function () {
-                item.delete();
+            let item = this;
+            remove_btn.addEventListener("click", async function () {
+                await item.delete();
             }, false);
         }
 
@@ -95,7 +93,7 @@ class Location {
     load() {
         let loader = document.querySelector(`${this.templateId}Loader`).content;
 
-        let rawLocationId = this.customId ? this.customId : this.locationNameOrCoords;
+        let rawLocationId = this.customId ? this.customId : this.locationName;
         this.locationId = generateLocationId(rawLocationId);
         loader.querySelector('*[name="container"]').id = this.locationId;
 
@@ -119,7 +117,7 @@ class Location {
     }
 
     async delete() {
-        await fetch(`${BACKEND_URL}/favourites/${this.locationId}`, {method: 'DELETE'}).then(() => {});
+        await Api.deleteLocation(this.locationId);
 
         locationMap.delete(this.locationId);
         savedLocations.delete(this.locationId);
@@ -183,30 +181,24 @@ async function addSavedLocation(evt) {
         return;
     }
 
-    try {
-        let resp = await fetch(
-            `${BACKEND_URL}/favourites`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({'name': newLocationId})
-            }
-        );
-        console.log(resp);
+    let newLocation = new Location(SECONDARY_LOCATION_TEMPLATE, locationSearchString, newLocationId, false);
 
-        let newLocation = new Location(SECONDARY_LOCATION_TEMPLATE, locationSearchString, newLocationId,false);
-        locationMap.set(newLocationId, newLocation);
+    let resp = await Api.addFavouriteLocation(locationSearchString);
 
-        savedLocations.add(newLocationId);
+    switch (resp.status) {
+        case 200:
+            locationMap.set(newLocationId, newLocation);
+            savedLocations.add(newLocationId);
 
-        rebuildLocationList();
-    } catch (error) {
-        console.log("Failed to add new location ", newLocationId, error);
+            rebuildLocationList();
+            return;
+        case 404:
+            window.alert(`Локация "${locationSearchString}" не найдена!`);
+            return;
+        default:
+            window.alert(`Ошибка работы API!`);
     }
 }
-
 
 function getCurrentLocationLoader() {
     let weatherTemplate = document.querySelector("#currentLocationTemplateLoader").content;
@@ -227,7 +219,7 @@ function rebuildLocationList() {
 
 async function initSavedLocations() {
     for (let weatherId of savedLocations) {
-        let location = new Location("#savedLocationTemplate", weatherId);
+        let location = new Location(SECONDARY_LOCATION_TEMPLATE, weatherId);
         locationMap.set(weatherId, location);
     }
     rebuildLocationList();
@@ -235,7 +227,7 @@ async function initSavedLocations() {
 
 
 async function initPage() {
-    let favouritesResp = await fetch(`${BACKEND_URL}/favourites`);
+    let favouritesResp = await Api.getFavouriteLocations();
     let secondaryWeatherLocationsList = await favouritesResp.json();
     savedLocations = new Set(secondaryWeatherLocationsList.map(({name}) => name));
 
