@@ -23,28 +23,34 @@ class Location {
         this.templateId = templateId;
         this.location = location;
         this.customId = customId;
-        this.fetchCoords = fetchCoords;
+        this.searchByCoords = fetchCoords;
 
         this.weatherData = null;
     }
 
     async fetchWeather() {
+        let resp;
         try {
-            if (this.fetchCoords) {
-                var resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.location.lat}&long=${this.location.long}`);
+            if (this.searchByCoords) {
+                resp = await fetch(`${BACKEND_URL}/weather/coordinates?lat=${this.location.lat}&long=${this.location.long}`);
             } else {
-                var resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.location}`);
+                resp = await fetch(`${BACKEND_URL}/weather/city?q=${this.location}`);
             }
         } catch (e) {
             if (!(e instanceof TypeError)) {
                 throw e;
             }
-            throw new WeatherError(e.message);
+            return;
         }
 
-        if (resp.status == 200) {
-            this.weatherData = await resp.json();
-            return true;
+        switch (resp.status) {
+            case 200:
+                this.weatherData = await resp.json();
+                return false;
+            case 404:
+                window.alert(`Локация не найдена!`)
+                this.delete();
+                return true;
         }
 
         throw new WeatherError(await resp.text());
@@ -74,26 +80,6 @@ class Location {
         weatherTemplate.querySelector('*[name="container"]').id = this.locationId;
 
         let clone = document.importNode(weatherTemplate, true);
-        let remove_btn = clone.querySelector(".remove-btn");
-        if (remove_btn) {
-            var item = this;
-            remove_btn.addEventListener("click", function () {
-                item.delete();
-            }, false);
-        }
-
-        return clone;
-    }
-
-    fillDataError(errorMessage) {
-        let errorTemplate = document.querySelector(`${this.templateId}Error`).content;
-
-        try {
-            errorTemplate.querySelector('h3').textContent = this.location;
-        } catch (e) {}
-        errorTemplate.querySelector('h4').textContent = errorMessage;
-
-        let clone = document.importNode(errorTemplate, true);
         let remove_btn = clone.querySelector(".remove-btn");
         if (remove_btn) {
             var item = this;
@@ -146,18 +132,19 @@ function initCurrentLocation() {
 
 
 async function loadCurrentLocation(location) {
+    let searchByCoords;
     if (location instanceof GeolocationPosition) {
         location = {
             'lat': location.coords.latitude,
             'long': location.coords.longitude
         };
-        var fetchCoords = true;
+        searchByCoords = true;
     }
     else {
-        var fetchCoords = false;
+        searchByCoords = false;
     }
 
-    let primaryWeatherItem = new Location("#currentLocationTemplate", location, "_here", fetchCoords);
+    let primaryWeatherItem = new Location("#currentLocationTemplate", location, "_here", searchByCoords);
     let primaryWeather = primaryWeatherItem.build();
 
     let wrapNode = document.querySelector(".block-main");
@@ -179,7 +166,7 @@ async function addSavedLocation(evt) {
     let locationSearchString = input.value;
     input.value = "";
 
-    if (locationSearchString == "") {
+    if (!locationSearchString) {
         window.alert("Необходимо ввести название локации");
         return;
     }
@@ -190,10 +177,6 @@ async function addSavedLocation(evt) {
         return;
     }
     
-    let newLocation = new Location("#savedLocationTemplate", locationSearchString, newLocationId);
-    locationMap.set(newLocationId, newLocation);
-
-    savedLocations.add(newLocationId);
     await fetch(
         `${BACKEND_URL}/favourites`,
         {
@@ -203,18 +186,18 @@ async function addSavedLocation(evt) {
             },
             body: JSON.stringify({'name': newLocationId})
         }
-    )
-
+    );
     rebuildLocationList();
 }
 
 
 function deleteSavedLocation(nodeId) {
+    event.preventDefault();
+    fetch(`${BACKEND_URL}/favourites?name=${nodeId}`, {method: 'DELETE'}).then(() => {});
+    
     locationMap.delete(nodeId);
     savedLocations.delete(nodeId);
     
-    fetch(`${BACKEND_URL}/favourites?name=${nodeId}`, {method: 'DELETE'})
-
     rebuildLocationList();
 }
 
@@ -229,7 +212,7 @@ function rebuildLocationList() {
     let wrapNode = document.querySelector(".block-extra");
     wrapNode.textContent = "";
 
-    for (var [id, item] of locationMap) {
+    for (let [id, item] of locationMap) {
         let node = item.build();
         wrapNode.appendChild(node);
     }
@@ -246,7 +229,7 @@ async function initSavedLocations() {
 
 
 async function initPage() {
-    let favouritesResp = await fetch(`${BACKEND_URL}/favourites`).catch(console.log);
+    let favouritesResp = await fetch(`${BACKEND_URL}/favourites`);
     let secondaryWeatherLocationsList = await favouritesResp.json();
     savedLocations = new Set(secondaryWeatherLocationsList.map(({name}) => name));
 
@@ -258,3 +241,4 @@ async function initPage() {
 document.addEventListener("DOMContentLoaded", initPage);
 document.querySelector("#addLocationForm").addEventListener("submit", addSavedLocation);
 document.querySelector("#refreshGeo").addEventListener("click", initCurrentLocation);
+addEventListener('beforeunload',()=>{debugger});
