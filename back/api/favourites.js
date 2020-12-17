@@ -1,22 +1,17 @@
-var request = require('request');
+let fetch = require('node-fetch');
 
-var server = require('../server');
+let server = require('../server');
+let config = require('../config');
 
 
-// function checkLocationExists(locationName) {
-//     request.get(
-//         encodeURI(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`),
-//         {json: true},
-//         (apiErr, apiResp, apiRespBody) => {
-//             switch (apiResp.statusCode) {
-//                 case 200:
-//                     return true;
-//                 default:
-//                     return false;
-//             }
-//         }
-//     );
-// }
+function checkLocationExists(locationName) {
+    return fetch(`https://api.weatherapi.com/v1/current.json?q=${locationName}&key=${config.WEATHER_API_KEY}`).then(
+        resp => {
+            console.info(`Location "${locationName}" found: ${resp.ok}, status: ${resp.status}`);
+            return resp.ok;
+        }
+    )
+}
 
 
 server.app.get('/favourites', (req, res) => {
@@ -32,18 +27,23 @@ server.app.get('/favourites', (req, res) => {
     })
 });
 
-server.app.post('/favourites', (req, res) => {
+server.app.post('/favourites', async (req, res) => {
     console.info(`New POST request on /favourites: name=${req.body.name}`)
     if (!req.body.name) {
         res.status(400).send("Please specify location name");
         return;
     }
-    // if (!checkLocationExists(req.body.name)) {
-    //     res.status(404).send("Location not found");
-    //     return;
-    // }
 
-    let statement = server.db.prepare('INSERT INTO favourites VALUES (?)');
+    console.log(`Checking if location "${req.body.name}" exists`)
+
+    const locationExists = await checkLocationExists(req.body.name)
+    if (!locationExists) {
+        console.warn(`Location "${req.body.name}" not found`)
+        res.status(404).send("Location not found");
+        return;
+    }
+
+    let statement = server.db.prepare("INSERT INTO favourites VALUES (?)");
 
     statement.run(req.body.name, (err) => {
         if (err) {
@@ -63,7 +63,7 @@ server.app.delete('/favourites/:name', (req, res) => {
         return;
     }
 
-    let statement = server.db.prepare('DELETE FROM favourites WHERE name=?');
+    let statement = server.db.prepare("DELETE FROM favourites WHERE name=?");
 
     statement.run(req.params.name, (err) => {
         if (err) {

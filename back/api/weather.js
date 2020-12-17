@@ -1,7 +1,7 @@
-var request = require('request');
+let request = require('request');
 
-var server = require('../server');
-var config = require('../config');
+let server = require('../server');
+let config = require('../config');
 
 
 function parseWeatherData(data) {

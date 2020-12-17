@@ -5,12 +5,12 @@ const sqlite3 = require('sqlite3')
 const config = require('./config')
 
 
-var app = express();
+let app = express();
 app.use(express.static('../front'));
 app.use(express.json());
 app.use(cors());
 
-var db = new sqlite3.Database(config.DB_SOURCE, (err) => {
+let db = new sqlite3.Database(config.DB_SOURCE, (err) => {
     if (err) {
         console.error(err.message);
         throw err;
