@@ -213,6 +213,16 @@ h4 {
     font-size: 2rem;
 }
 
+.saved-location-loader {
+    text-align: center;
+    margin-top: 10px;
+    flex: calc(50% - 25px);
+}
+
+.info-block:nth-child(2n){
+    margin-left: 2rem;
+}
+
 @media only screen and (max-width: 1440px) {
     .wrapper {
         width: 75%;
