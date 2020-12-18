@@ -14,32 +14,31 @@ function checkLocationExists(locationName) {
 }
 
 
-server.app.get('/favourites', (req, res) => {
+server.app.get('/favourites', (req, resp) => {
     console.info(`New GET request on /favourites`)
     server.db.all('SELECT name FROM favourites', (err, rows) => {
         if (err) {
             console.error(err.message);
-            res.status(500).set('Access-Control-Allow-Origin', "*").send("Database error");
+            resp.status(500).set('Access-Control-Allow-Origin', "*").send("Database error");
             return;
         }
 
-        res.json(rows);
+        resp.json(rows);
     })
 });
 
-server.app.post('/favourites', async (req, res) => {
+server.app.post('/favourites', async (req, resp) => {
     console.info(`New POST request on /favourites: name=${req.body.name}`)
     if (!req.body.name) {
-        res.status(400).send("Please specify location name");
+        console.warn("Got an empty location name")
+        resp.status(400).send("Please specify location name");
         return;
     }
-
-    console.log(`Checking if location "${req.body.name}" exists`)
 
     const locationExists = await checkLocationExists(req.body.name)
     if (!locationExists) {
         console.warn(`Location "${req.body.name}" not found`)
-        res.status(404).send("Location not found");
+        resp.status(404).send("Location not found");
         return;
     }
 
@@ -48,30 +47,26 @@ server.app.post('/favourites', async (req, res) => {
     statement.run(req.body.name, (err) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Database error");
+            resp.status(500).send("Database error");
             return;
         }
 
-        res.status(200).json({'status': 'ok'});
+        resp.status(200).json({'status': 'ok'});
     });
 });
 
-server.app.delete('/favourites/:name', (req, res) => {
-    console.info(`New DELETE request on /favourites, name=${req.params.name}`)
-    if (!req.params.name) {
-        res.status(400).send("Please specify location name");
-        return;
-    }
+server.app.delete('/favourites/:name', (req, resp) => {
+    console.info(`New DELETE request on /favourites, name=${req.params.name}`);
 
     let statement = server.db.prepare("DELETE FROM favourites WHERE name=?");
 
     statement.run(req.params.name, (err) => {
         if (err) {
             console.error(err);
-            res.status(500).send("Database error");
+            resp.status(500).send("Database error");
             return;
         }
 
-        res.status(200).json({'status': 'ok'});
+        resp.status(200).json({'status': 'ok'});
     });
 });

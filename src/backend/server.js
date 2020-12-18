@@ -6,7 +6,7 @@ const config = require('./config')
 
 
 let app = express();
-app.use(express.static('../front'));
+app.use(express.static('../frontend'));
 app.use(express.json());
 app.use(cors());
 

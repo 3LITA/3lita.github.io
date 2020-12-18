@@ -163,10 +163,10 @@ async function loadDefaultLocation(error) {
 }
 
 
-async function addSavedLocation(evt) {
+async function addFavouriteLocation(evt) {
     evt.preventDefault();
 
-    let input = evt.target.querySelector("#addLocationInput");
+    let input = evt.target.elements.favouriteLocation;
     let locationSearchString = input.value;
     input.value = "";
 
@@ -237,6 +237,17 @@ async function initPage() {
 
 
 document.addEventListener("DOMContentLoaded", initPage);
-document.querySelector("#addLocationForm").addEventListener("submit", addSavedLocation);
+document.querySelector("#addLocationForm").addEventListener("submit", addFavouriteLocation);
 document.querySelector("#refreshGeo").addEventListener("click", initCurrentLocation);
-addEventListener('beforeunload',()=>{debugger});
+
+
+export {
+    initPage,
+    initCurrentLocation,
+    initSavedLocations,
+    loadCurrentLocation,
+    loadDefaultLocation,
+    addFavouriteLocation,
+    savedLocations,
+    Location
+}

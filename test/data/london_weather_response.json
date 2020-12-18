@@ -1,0 +1,12 @@
+{
+  "name": "London",
+  "icon": "https://cdn.weatherapi.com/weather/128x128/night/296.png",
+  "temperature": "3°C",
+  "details": {
+    "wind": "20.2 kph WNW",
+    "clouds": "Light rain",
+    "pressure": "1011 mb",
+    "humidity": "93%",
+    "coords": "[51.52, -0.11]"
+  }
+}
