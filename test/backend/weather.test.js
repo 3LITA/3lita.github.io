@@ -1,5 +1,5 @@
-let server = require('../../src/back/server')
-require('../../src/back/api/weather');
+let server = require('../../src/backend/server')
+require('../../src/backend/api/weather');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -7,7 +7,7 @@ let fs = require('fs');
 let path = require('path');
 let rewire = require('rewire');
 
-let weatherModule = rewire('../../src/back/api/weather');
+let weatherModule = rewire('../../src/backend/api/weather');
 let parseWeatherData = weatherModule.__get__('parseWeatherData');
 
 

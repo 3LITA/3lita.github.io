@@ -1,5 +1,5 @@
-let server = require('../../src/back/server');
-require('../../src/back/api/favourites');
+let server = require('../../src/backend/server');
+require('../../src/backend/api/favourites');
 
 let chai = require('chai')
 let chaiHttp = require('chai-http')

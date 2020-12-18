@@ -2,10 +2,10 @@
   "name": "itmoweb",
   "version": "1.0.0",
   "description": "ITMO web course",
-  "main": "src/back/index.js",
+  "main": "src/backend/index.js",
   "scripts": {
-    "devrun": "nodemon src/back/index.js",
-    "start": "node src/back/index.js",
+    "devrun": "nodemon src/backend/index.js",
+    "start": "node src/backend/index.js",
     "test": "mocha --recursive -r esm"
   },
   "repository": {
