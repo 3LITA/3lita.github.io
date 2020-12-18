@@ -135,12 +135,18 @@ class Location {
         if (removeBtn) {
             removeBtn.disabled = true;
         }
-        await Api.deleteLocation(this.locationId);
+        try {
+            await Api.deleteLocation(this.locationId);
+            locationMap.delete(this.locationId);
+            savedLocations.delete(this.locationId);
 
-        locationMap.delete(this.locationId);
-        savedLocations.delete(this.locationId);
-
-        rebuildLocationList();
+            rebuildLocationList();
+        } catch (e) {
+            if (e instanceof TypeError) {
+                window.alert("Пропало интернет соединение. Повторите попытку позже");
+                // removeBtn.disabled = false;
+            }
+        }
     }
 }
 
