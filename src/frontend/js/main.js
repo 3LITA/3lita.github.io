@@ -222,7 +222,6 @@ async function addFavouriteLocation(evt) {
         if (e instanceof TypeError) {
             newLocation.removeLoadingPreview();
             window.alert("Пропало интернет-соединение. Повторите попытку позже")
-            await newLocation.delete();
         }
     }
 }
