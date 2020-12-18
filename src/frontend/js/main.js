@@ -117,6 +117,8 @@ class Location {
     }
 
     async delete() {
+        let removeBtn = document.querySelector(`#${this.locationId} div.extra-city-header button.remove-btn`);
+        removeBtn.disabled = true;
         await Api.deleteLocation(this.locationId);
 
         locationMap.delete(this.locationId);
