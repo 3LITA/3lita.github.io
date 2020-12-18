@@ -100,6 +100,11 @@ class Location {
         wrapNode.appendChild(document.importNode(loader, true));
     }
 
+    removeLoadingPreview() {
+        let loadingPreview = document.querySelector(`#${this.locationId}`)
+        loadingPreview.parentNode.removeChild(loadingPreview);
+    }
+
     load() {
         let loader = document.querySelector(`${this.templateId}Loader`).content;
         let rawLocationId = this.customId ? this.customId : this.locationName;
@@ -127,7 +132,9 @@ class Location {
 
     async delete() {
         let removeBtn = document.querySelector(`#${this.locationId} div.extra-city-header button.remove-btn`);
-        removeBtn.disabled = true;
+        if (removeBtn) {
+            removeBtn.disabled = true;
+        }
         await Api.deleteLocation(this.locationId);
 
         locationMap.delete(this.locationId);
@@ -196,20 +203,27 @@ async function addFavouriteLocation(evt) {
 
     newLocation.showLoadingPreview();
 
-    let resp = await Api.addFavouriteLocation(newLocationId);
+    try {
+        let resp = await Api.addFavouriteLocation(newLocationId);
+        switch (resp.status) {
+            case 200:
+                locationMap.set(newLocationId, newLocation);
+                savedLocations.add(newLocationId);
 
-    switch (resp.status) {
-        case 200:
-            locationMap.set(newLocationId, newLocation);
-            savedLocations.add(newLocationId);
-
-            rebuildLocationList();
-            return;
-        case 404:
-            window.alert(`Локация "${locationSearchString}" не найдена!`);
-            return;
-        default:
-            window.alert(`Ошибка работы API!`);
+                rebuildLocationList();
+                return;
+            case 404:
+                window.alert(`Локация "${locationSearchString}" не найдена!`);
+                return;
+            default:
+                window.alert(`Ошибка работы API!`);
+        }
+    } catch (e) {
+        if (e instanceof TypeError) {
+            newLocation.removeLoadingPreview();
+            window.alert("Пропало интернет-соединение. Повторите попытку позже")
+            await newLocation.delete();
+        }
     }
 }
 
