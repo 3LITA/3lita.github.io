@@ -7,7 +7,7 @@ let savedLocations = new Set();
 
 
 function generateLocationId(src) {
-    return src.replaceAll(" ", "-").toLowerCase();
+    return src.replace(" ", "-").toLowerCase();
 }
 
 
@@ -166,7 +166,8 @@ async function loadDefaultLocation(error) {
 async function addFavouriteLocation(evt) {
     evt.preventDefault();
 
-    let input = evt.target.querySelector("#addLocationInput");
+    // let input = evt.target.querySelector("#addLocationInput");
+    let input = evt.target.elements.favouriteLocation;
     let locationSearchString = input.value;
     input.value = "";
 
@@ -239,3 +240,14 @@ async function initPage() {
 document.addEventListener("DOMContentLoaded", initPage);
 document.querySelector("#addLocationForm").addEventListener("submit", addFavouriteLocation);
 document.querySelector("#refreshGeo").addEventListener("click", initCurrentLocation);
+
+
+export {
+    initPage,
+    initCurrentLocation,
+    initSavedLocations,
+    loadCurrentLocation,
+    loadDefaultLocation,
+    addFavouriteLocation,
+    savedLocations
+}

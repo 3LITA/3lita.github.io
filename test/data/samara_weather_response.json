@@ -1,0 +1,12 @@
+{
+  "name": "Samara",
+  "icon": "https://cdn.weatherapi.com/weather/128x128/night/326.png",
+  "temperature": "-7.1°C",
+  "details": {
+    "wind": "13 kph E",
+    "clouds": "Light snow",
+    "pressure": "1002 mb",
+    "humidity": "100%",
+    "coords": "[53.18, 50.12]"
+  }
+}
