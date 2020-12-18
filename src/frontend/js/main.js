@@ -90,9 +90,18 @@ class Location {
         return clone;
     }
 
+    showLoadingPreview() {
+        let wrapNode = document.querySelector(".block-extra");
+
+        let loader = document.querySelector(`${this.templateId}Loader`).content;
+        let rawLocationId = this.customId ? this.customId : this.locationName;
+        this.locationId = generateLocationId(rawLocationId);
+        loader.querySelector('*[name="container"]').id = this.locationId;
+        wrapNode.appendChild(document.importNode(loader, true));
+    }
+
     load() {
         let loader = document.querySelector(`${this.templateId}Loader`).content;
-
         let rawLocationId = this.customId ? this.customId : this.locationName;
         this.locationId = generateLocationId(rawLocationId);
         loader.querySelector('*[name="container"]').id = this.locationId;
@@ -184,6 +193,8 @@ async function addFavouriteLocation(evt) {
     }
 
     let newLocation = new Location(SECONDARY_LOCATION_TEMPLATE, locationSearchString, newLocationId, false);
+
+    newLocation.showLoadingPreview();
 
     let resp = await Api.addFavouriteLocation(newLocationId);
 
