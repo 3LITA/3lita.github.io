@@ -110,7 +110,7 @@ describe('Frontend Tests', () => {
 
     describe('Favourite Locations', () => {
         beforeEach(() => {
-            const mockEvent = {
+            let mockEvent = {
                 preventDefault: () => {},
                 target: {
                     elements: {
@@ -135,7 +135,18 @@ describe('Frontend Tests', () => {
         });
 
         it('should add new favourite location', async () => {
-            await main.addFavouriteLocation(global.event);
+            let event = {
+                preventDefault: () => {},
+                target: {
+                    elements: {
+                        favouriteLocation: {
+                            value: "samara"
+                        }
+                    }
+                }
+            };
+
+            await main.addFavouriteLocation(event);
             await new Promise(r => setTimeout(r, 10));
 
             let favouriteLocation = document.querySelector('li[id="samara"]');
@@ -143,13 +154,23 @@ describe('Frontend Tests', () => {
         });
 
         it('should alert on empty value', (done) => {
-            global.event.target.elements.favouriteLocation.value = "";
+            let event = {
+                preventDefault: () => {},
+                target: {
+                    elements: {
+                        favouriteLocation: {
+                            value: ""
+                        }
+                    }
+                }
+            };
+
             global.window.alert = (message) => {
                 chai.expect(message).to.be.equal("Необходимо ввести название локации");
                 done();
             };
 
-            main.addFavouriteLocation(global.event).then(() => {});
+            main.addFavouriteLocation(event).then(() => {});
         });
 
         it('should alert on duplicate favourite location', (done) => {
@@ -193,6 +214,37 @@ describe('Frontend Tests', () => {
         });
     });
 
+    describe('Removing favourite location', () => {
+        beforeEach(() => {
+            fetchMock.get(
+                favouritesUrl,
+                [{ name: 'samara' }, { name: 'london' }]
+            );
+        });
+
+        it('should remove the saved location', async () => {
+            await main.initPage();
+            await new Promise(r => setTimeout(r, 10));
+
+            let here = document.querySelector('.main-location-info h2');
+            chai.expect(here).to.not.be.null;
+            chai.expect(here.textContent).to.be.equal('London');
+
+            let favouriteLocation = document.querySelector('li[id="samara"]');
+            chai.expect(favouriteLocation).to.not.be.null;
+
+            chai.expect(main.savedLocations).to.contain('london');
+            let removeBtn = favouriteLocation.querySelector(".remove-btn");
+
+            chai.expect(removeBtn).to.not.be.null;
+            removeBtn.click();
+
+            await new Promise(r => setTimeout(r, 10));
+            chai.expect(main.savedLocations).to.contain('london');
+
+        });
+    });
+
     describe('Page Initialization', () => {
         beforeEach(() => {
             fetchMock.get(
@@ -209,10 +261,10 @@ describe('Frontend Tests', () => {
             chai.expect(here).to.not.be.null;
             chai.expect(here.textContent).to.be.equal('London');
 
-            let bookmark = document.querySelector('li[id="samara"]');
-            chai.expect(bookmark).to.not.be.null;
-            bookmark = document.querySelector('li[id="london"]');
-            chai.expect(bookmark).to.not.be.null;
+            let favouriteLocation = document.querySelector('li[id="samara"]');
+            chai.expect(favouriteLocation).to.not.be.null;
+            favouriteLocation = document.querySelector('li[id="london"]');
+            chai.expect(favouriteLocation).to.not.be.null;
         });
     });
 

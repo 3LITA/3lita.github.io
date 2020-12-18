@@ -6,7 +6,7 @@
   "scripts": {
     "devrun": "nodemon src/backend/index.js",
     "start": "node src/backend/index.js",
-    "test": "mocha --recursive -r esm"
+    "test": "nyc mocha --recursive -r esm"
   },
   "repository": {
     "type": "git",
@@ -36,6 +36,7 @@
     "jsdom": "^16.4.0",
     "mocha": "^8.2.1",
     "nodemon": "^2.0.6",
+    "nyc": "^15.1.0",
     "rewire": "^5.0.0",
     "sinon": "^9.2.2"
   },

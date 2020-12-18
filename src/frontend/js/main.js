@@ -166,7 +166,6 @@ async function loadDefaultLocation(error) {
 async function addFavouriteLocation(evt) {
     evt.preventDefault();
 
-    // let input = evt.target.querySelector("#addLocationInput");
     let input = evt.target.elements.favouriteLocation;
     let locationSearchString = input.value;
     input.value = "";
@@ -249,5 +248,6 @@ export {
     loadCurrentLocation,
     loadDefaultLocation,
     addFavouriteLocation,
-    savedLocations
+    savedLocations,
+    Location
 }
