@@ -1,0 +1,41 @@
+{
+  "location": {
+    "name": "Samara",
+    "region": "Samara",
+    "country": "Russia",
+    "lat": 53.18,
+    "lon": 50.12,
+    "tz_id": "Europe/Samara",
+    "localtime_epoch": 1608250213,
+    "localtime": "2020-12-18 4:10"
+  },
+  "current": {
+    "last_updated_epoch": 1608236045,
+    "last_updated": "2020-12-18 00:14",
+    "temp_c": -7.1,
+    "temp_f": 19.2,
+    "is_day": 0,
+    "condition": {
+      "text": "Light snow",
+      "icon": "//cdn.weatherapi.com/weather/64x64/night/326.png",
+      "code": 1213
+    },
+    "wind_mph": 8.5,
+    "wind_kph": 13.7,
+    "wind_degree": 243,
+    "wind_dir": "WSW",
+    "pressure_mb": 1018.0,
+    "pressure_in": 30.5,
+    "precip_mm": 0.2,
+    "precip_in": 0.01,
+    "humidity": 95,
+    "cloud": 94,
+    "feelslike_c": -12.8,
+    "feelslike_f": 9.0,
+    "vis_km": 6.7,
+    "vis_miles": 4.0,
+    "uv": 1.0,
+    "gust_mph": 14.5,
+    "gust_kph": 23.4
+  }
+}

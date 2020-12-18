@@ -5,7 +5,8 @@
   "main": "src/back/index.js",
   "scripts": {
     "devrun": "nodemon src/back/index.js",
-    "start": "node src/back/index.js"
+    "start": "node src/back/index.js",
+    "test": "mocha --recursive -r esm"
   },
   "repository": {
     "type": "git",
@@ -26,8 +27,14 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.12.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "esm": "^3.2.25",
     "jest": "^26.6.3",
-    "nodemon": "^2.0.6"
+    "mocha": "^8.2.1",
+    "nodemon": "^2.0.6",
+    "rewire": "^5.0.0",
+    "sinon": "^9.2.2"
   },
   "jest": {
     "verbose": true,
